@@ -1,1 +1,645 @@
-<h1>helloooo</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="output.css" rel="stylesheet">
+    <title>Synth</title>
+</head>
+<body>
+        
+    <h1 class = "text-3xl font-bold p-2 text-center pt-5">
+    Additive Synthesis with colors and images
+    </h1>
+    <h2 class=" font-bold pb-5 text-center">
+    Sebastien Chow
+    </h2>
+    <div class = "inline-flex">
+        <div class = "inline-table w-1/2 p-10">
+            <h7 class = "font-bold text-2xl">
+                Introduction
+            </h7>
+            <p>
+                What is Additive Synthesis:
+                Additive synthesis is a sound synthesis technique that creates timbre by adding sine waves.
+                This comes from the idea that any sound is just the sum of many sine waves.
+                I found this idea to be very interesting, and I wanted to use it in a way to create unique sounds and timbres.
+                This gave me the idea to create some sort of additive synthesis synthesizer.
+                Then I wanted an interesting way to control the synthesizer, and I decided on using images and color. 
+            </p>
+            <br>
+            <h8 class = "font-bold text-2xl">
+                Software
+            </h8>
+            <p>
+                    
+                The main idea was to have multiple sine wave oscillators that correspond to each partial harmonic of a fundamental frequency, 
+                which would then be layered on top of one another to create a sound.
+                The image would be broken down into each individual pixel, and the RGB value of each pixel would be used to get specific amplitudes for each harmonic,
+                thereby changing the sound in the end. The hardest part and main problem for me was figuring out how the RGB values would be mapped to amplitude of the harmonics.
+                Originally, the synthesizer was made in Max/MSP, but this proved to be difficult and slow with all the oscillators and objects.
+                I moved to javascript and decided to make the synthesizer usable in a website.
+                <br>
+                <br>
+                Some of the main features I wanted out of this synthesizer, was for different colors to have distinct different sounds, in other words an image
+                that was all red would sound different from an image that was all blue.
+                From this I decided to have different harmonics correspond to the different colors.
+                So given a specific color with specific Red, Green, and Blue values, I chose to have the Red correspond to 
+                the 2nd, 5th, 8th, 11th, 14th, and so on for every third harmonic.
+                The Green would correspond to the 3rd, 6th, 9th, and every third harmonic after this, and
+                the Blue would correspond to the 4th, 7th, 10th, and every third harmonic after.
+                I also tested the sound with different number of oscillators, and decided that going up to the 110th harmonic was plenty, as any harmonics after that
+                were hard to hear.  
+                <br>
+                Decided to have Red correspond to 2,5,7,9,11,14,17,20,23 harmonics,
+                Blue correspond to 3,6,9,12,15,18,21,24 harmonics
+                Green correspond to 4,7,10,13,16,19,22,25 harmonics
+
+                The algorithm I made that maps the image to the synthesizer works in several parts.
+                first it does this so that this and then this so that this
+
+
+                also had to do like amplitude stuff so it sounds same volume always
+
+
+
+                The asdr,
+                so similar looking images could sound different in that they will have different attacks 
+
+                Then took idea of “bright” and “dark” to make low values correspond to low frequencies and high values to high frequencies nope!!!!!!!!
+                Separated the image by value, so more dark parts of image meant more lower frequencies like the 2nd, 3rd, and more light parts meant more higher frequencies, like 20th, 21st. Then the volume of a certain oscillator was proportional to how much blue or red or green it had, so if the brightest part of the image had lots of blue, then you would hear more of the 24th harmonic than the 23rd or 25th.
+                <br>
+                <br>
+                The user can create sounds in multiple ways:
+                they can upload an image from their computer, or 
+                they can draw on a canvas.
+
+                also thought about gifs and videos that update every 1/24th of a second or something
+
+                There is also a keyboard that pops up once you upload or finsih drawing a picture, that lets the user play with their newly synthesized sound
+                <br>
+
+                Here are some images:
+                these are all sine waves
+
+                This produces a square wave
+
+                this produces a sawtooth wave
+
+                this sounds kinda like a violin
+
+                this sounds kinda like a trumpet
+
+            </p>
+        </div>
+        <div class = "w-1/2 m-10">
+            <h9 class = "font-bold text-3xl">
+                Try it out!
+            </h9>
+            <br>
+            <br>
+            <div class = "inline w-1/2">
+                <h2 class = "font-bold">Upload Image</h2>
+                <input type="file" id="fileInput" accept="image/*" />
+                <canvas id="mycanvas" width="500" height="300" style="border:1px solid #000000;"> </canvas>
+                <br>
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" id="uploadBtn">Upload & Process</button>
+            </div>
+            <br>
+            <br>
+            <br>
+            <!-- 2) Draw on a canvas -->
+            <div class="inline-flex">
+                <div>
+                    <h2 class = "font-bold">Draw an Image</h2>
+                    <canvas id="drawingCanvas" width="500" height="300" style="border:1px solid black"></canvas><br>
+                    <button class = "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l" id="clearCanvas">Clear Canvas</button>
+                    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r" id="processCanvas" onclick="createValues()">Process Drawing</button>
+                </div>
+                <div class = "p-5" id="customizeBrush">
+                    <h3>Pick Color:</h3>
+                    <input type="color" id="colorpicker" onchange="clickColor(0, -1, -1, 5)" value="#ff0000" class="w-10 h-10">
+                    <h4>Select Brush Size:</h4>
+                    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-full" type="button" id = "small" onclick="strokeSize = 2"> small </button>
+                    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-full" type="button" id = "medium" onclick="strokeSize = 10"> med </button>
+                    <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-full" type="button" id = "big" onclick="strokeSize = 50"> large </button>
+                </div>
+            </div>  
+
+            <hr>
+
+            <div>
+                <h2>Result</h2>
+                <pre id="resultOutput"></pre>
+            </div>
+            <p id = "data" value="[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"></p>
+
+
+
+            <h1>Additive Synth</h1>
+
+            <label>Volume: <input type="range" id="vol" min = '0' max = '0.8' step = '0.01' value='0.8'></label>
+
+            <h1>Press a Key to play music</h1>
+            <p id="output">Press any key...</p>
+            
+        </div>
+    </div>
+
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const canvas2 = document.getElementById('mycanvas');
+
+        const ctx2 = canvas2.getContext('2d');
+        let img = null;
+
+        fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0]; // Get the selected file
+
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+            img = new Image(); // Create an image object
+            img.onload = () => {
+                // Clear the canvas
+                ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+                // Scale image to fit the canvas
+                const scale = Math.min(400 / img.width, 300 / img.height);
+                canvas2.width = img.width * scale;
+                canvas2.height = img.height * scale;
+                // Draw the image
+                ctx2.drawImage(img, 0, 0, img.width * scale, img.height * scale);
+            };
+            img.src = e.target.result; // Set the image source to the Base64 data
+            };
+
+            reader.readAsDataURL(file); // Read the file as a data URL
+        } else {
+            alert('Please upload a valid image file.');
+        }
+        });
+
+        
+
+
+        const uploadBtn = document.getElementById('uploadBtn');
+        const resultOutput = document.getElementById('resultOutput');
+
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        var pickedColor = '#000000';
+        var strokeSize = 2;
+        let isDrawing = false;
+        
+        let lastX = 0;
+        let lastY = 0;
+
+        const colorpicker = document.getElementById('colorpicker');
+
+
+        colorpicker.addEventListener('change', (e) => {
+            pickedColor = event.target.value;
+            console.log(pickedColor);
+        })
+
+        // --------------------------
+        // (A) Drawing on the Canvas
+        // --------------------------
+        canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.strokeStyle = pickedColor;
+        ctx.lineCap = 'round';
+        ctx.lineWidth = strokeSize;
+        ctx.stroke();
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+        });
+
+
+        
+
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+
+        document.getElementById('clearCanvas').addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        const output = document.getElementById('data');
+
+
+
+            //im thinking of somethinggggg like u separate the total values and sort them, so higher harmonics only happen when there are more colors (we knew this)
+            //but instead of the the partial being chosen based on how much area the color takes up, it can be chosen based on its value.
+            // the amount of area it takes up can be used to scale the individual rgb values to give us the actual amplitude if a frequency
+            //or amount can be asdr? because i cant really do anything with it rn
+
+            //alsooo once we get that the length of our dict (number of keys i.e. number of colors) is more than 36, we can start dividing it into
+            //36 parts, where some parts may have multiple keys, in which case in those parts with multiple keys,
+            //if sort by value then this is good, but otherwise just do the extra guys to asdr
+            //the key that has the most number of pixels is the main guy,
+            //the rest go to asdr? or soemthing else i suppose
+            //could have it become vibrato or summn
+            function ImgtoSound(R, G, B, A){
+                var asdrlist = []
+                var volumes = [];
+                var value;
+                let dict = {};
+                let asdrdict = {};
+                //rounded rgb values
+                var Rr;
+                var Gr;
+                var Br;
+                for (let i = 0; i < R.length; i++){
+                    Rr = R[i] - (R[i] % 10);
+                    Gr = G[i] - (G[i] % 10);
+                    Br = B[i] - (B[i] % 10);
+                    value = [Rr,Gr,Br];
+                    if (A[i] = 1){
+                        if (value in dict){
+                            dict[value] += 1;
+                        } else {
+                            dict[value] = 1;
+                        }
+                    }
+                }
+                for (let [color, amount] of Object.entries(dict)){
+                    if (amount < 20){
+                        delete dict[color];
+                    }
+                }
+                const sortedDict = Object.fromEntries(
+                    Object.entries(dict)
+                    .sort(([, aValue], [, bValue]) => bValue - aValue)
+                );
+
+                if (Object.keys(sortedDict).length > 36){
+                    //amount of pixels will go to time? or to how much amplitude changes by?
+                }
+                output.textContent = Object.entries(sortedDict);
+                var i = 0;
+                for (let [color, amount] of Object.entries(sortedDict)){
+                    colors = color.split(',');
+                    volumes[(3 * i)] = colors[0];
+                    volumes[(3 * i) + 1] = colors[1];
+                    volumes[(3 * i) + 2] = colors[2];
+                    i++;
+                }
+                
+                return volumes;
+            }
+
+        document.getElementById('processCanvas').addEventListener('click', async () => {
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            //const output = document.getElementById('data');
+            var volume = document.getElementById('vol').value;
+            var Rs = [];
+            var Gs = [];
+            var Bs = [];
+            var As = []
+            var j = 0;
+            var k = 0;
+            var l = 0;
+            var m = 0;
+            var all = [];
+            for (let i = 0; i <= data.length; i++){
+                if (i % 4 == 0){
+                    Rs[j] = data[i];//*volume/255;
+                    j ++;
+                }
+                if (i % 4 == 1){
+                    Gs[k] = data[i];//*volume/255;
+                    k++;
+                }
+                if (i % 4 == 2){
+                    Bs[l] = data[i];// * volume/255;
+                    l++;
+                } else {
+                    As[m] = data[i];
+                    m++;
+                }
+                all[i] = data[i];
+            }
+            //let x = ImgtoSound(Rs, Gs, Bs);
+            
+            output.value = ImgtoSound(Rs, Gs, Bs, As);
+            //output.textContent = output.value; 
+
+        });
+
+
+        // ---------------------------
+        // (B) Uploading an Image File
+        // ---------------------------
+        uploadBtn.addEventListener('click', async () => {
+        if (!fileInput.files.length) {
+            alert('Please choose an image file first.');
+            return;
+        }
+
+            const imageData2 = ctx2.getImageData(0, 0, canvas2.width, canvas2.height);
+            const data2 = imageData2.data;
+            //const output2 = document.getElementById('data');
+            var volume = document.getElementById('vol').value;
+            var Rs = [];
+            var Gs = [];
+            var Bs = [];
+            var As = [];
+            var j = 0;
+            var k = 0;
+            var l = 0;
+            var m = 0;
+            for (let i = 0; i <= data2.length; i++){
+                if (i % 4 == 0){
+                    Rs[j] = data2[i];//*volume/255;
+                    j ++;
+                }
+                if (i % 4 == 1){
+                    Gs[k] = data2[i];// * volume/255;
+                    k++;
+                }
+                if (i % 4 == 2){
+                    Bs[l] = data2[i];// * volume/255;
+                    l++;
+                } else {
+                    As[m] = data[i];
+                    m++;
+                }
+            }
+            
+            output.value = ImgtoSound(Rs, Gs, Bs, As);
+            output.textContent = ImgtoSound(Rs, Gs, Bs, As).value; 
+
+
+        
+            //lets start with: if there is one color- then it is only the first 3 oscillators
+            //if there is 2 colors- then its first 6
+            //or could have red be the higher partials idk what im doing
+            
+            //i think i want for when there is more detailed colors i.e. like a lot of details and different colors, thats when u get th higher frequencies
+
+            //what if i have another function, that just takes in a volume argument,,,
+            //and then inside it returns the vol[] list for the partials but skewed based on the volume argument
+            //and so the vol[] list is basically made once u process, but playing it is based on the function call
+            //so function should go pretty quickly
+            //no yes this function is only called when the volume changes, that way it doesnt have to calculate constantly, only once
+
+
+        });
+        let audioCtx;
+        let oscillators = [];
+        let gains = [];
+        var partialParams = [];
+        const attack = 0.1;
+        const decay = 0.2;
+        const sustain = 0.5;
+        const release = 0.3;
+
+            //if iw ant midi controller,,,, might need to get midi to work with it (i.e. use c++ and rtmidi)
+        function playAudio(fundamental) {
+            
+            // Create (or resume) AudioContext
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            // Some browsers (especially mobile) need a user gesture, so we resume if suspended
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            //oooooh wait split into 36 sections... (36 * 3 = 108) + 1 = 109
+            //so then we have that red is 2 blue is 3 green is 4, red is 5 blue is 6...and so on
+            //hmmmmmmmm split image into 110 sections ? order by total value ?(R + G + B) first section has lowest value colors == first harmonic
+            //then if there are only say 16 colors on the image, then there will by default be only 16 harmonics (17-110 will have amplitude 0)
+            //and the size of the color will dictate how much amplitude goes to that harmonic? and what else... asdr is the shape of that color?
+            //so what if there are like 72 colors, so each 'section' has 2 colors in it. Then just have a more detailed asdr? i guess sooo
+            //what about the idea that the majority color dictates something. honestly no
+            //but now isnt it impossible to have like equal volume for a bunch of things?? no its not ! can have a less blue that is still only blue
+            //for now lets try to have the volume of fundamental just be 1 always... but im not sure if i want that forever
+            //maybe something else can change the volume of the fundamental hmmmmyessss
+            //and then something can add inharmonicity, and something can add vibrato hmmmm yessss
+            const now = audioCtx.currentTime;
+            const hm = document.getElementById('data');
+            var volume = document.getElementById('vol').value;
+            var vol = [];
+            var partials = [];
+            for (let i = 1; i <= 110; i++){ 
+                partials[i] = (i);
+                if (i == 1){
+                    vol[i] = volume;
+                } else {
+                    vol[i] = 0;
+                }
+            }
+            var total_vol = 0;
+            var temp = 0;
+            for (let i = 1; i< hm.value.length; i++){
+                total_vol += hm.value[i]/300;
+            }
+            if (total_vol == 0){
+                total_vol = 1;
+            }
+            for (let i = 1; i < hm.value.length; i++){
+                vol[i] = hm.value[i]/255;
+                vol[i] = vol[i] * volume/total_vol;
+            }
+            vol[1] = volume; 
+
+            // Define partials from the form inputs
+            for (let i = 1; i<= 110; i++){ //seems like 110 partials is kinda the max we can hear
+                partialParams[i] = {freq: fundamental*partials[i], amp: vol[i]} //can have a param.attacklen param.decaylen, param.attackamp and stuff
+                //and can also have values for the amplitude before the sustain and stuff that we can add on
+            }
+
+            // Create an oscillator+gain pair for each partial
+            partialParams.forEach(param => {
+                const osc = audioCtx.createOscillator();
+                osc.frequency.value = param.freq;
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.value = param.amp;
+
+                // Connect oscillator -> gain -> destination
+                osc.connect(gainNode).connect(audioCtx.destination);
+                gainNode.gain.cancelScheduledValues(now); // Clear any previous schedules
+                gainNode.gain.setValueAtTime(0, now); // Start at 0 gain
+                gainNode.gain.linearRampToValueAtTime(param.amp, now + 0.01); // Attack phase
+                gainNode.gain.linearRampToValueAtTime(param.amp*1/2, now + attack + decay); // Decay to sustain
+                
+
+                oscillators.push(osc);
+                gains.push(gainNode);
+            });
+
+            // Start all oscillators
+            oscillators.forEach(osc => osc.start());
+            }
+    
+            function stopAudio() {
+            // Stop and clean up existing oscillators
+                let i = 0;
+                oscillators.forEach(osc => {
+                    try {
+                    now = audioCtx.currentTime;
+                    gainNode = gains[i];
+                    gainNode.gain.cancelScheduledValues(now); // Clear previous schedules
+                    gainNode.gain.setValueAtTime(gainNode.gain.value, now); // Start from current value
+                    gainNode.gain.linearRampToValueAtTime(0, now + release); // Ramp down to 0
+                    
+                    osc.stop(now + release);
+                    i++;
+                    } catch(e) {
+                    // Catch 'already stopped' errors
+                    }
+                });
+                oscillators = [];
+                gains = [];
+            }
+        
+
+
+
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key; // Get the key name (e.g., "a", "Enter", etc.)
+            const output = document.getElementById('output');
+
+            // keyboard
+            switch(key){
+                case 'q':
+                    playAudio(87.307);
+                    break;
+                case '2':
+                    playAudio(92.499);
+                    break;
+                case 'w':
+                    playAudio(97.999);
+                    break;
+                case '3':
+                    playAudio(103.826);
+                    break;
+                case 'e':
+                    playAudio(110);
+                    break;
+                case '4':
+                    playAudio(116.541);
+                    break;
+                case 'r':
+                    playAudio(123.471);
+                    break;
+                case 't':
+                    playAudio(130.813);
+                    break;
+                case '6':
+                    playAudio(138.591);
+                    break;
+                case 'y':
+                    playAudio(146.832);
+                    break;
+                case '7':
+                    playAudio(155.564);
+                    break;
+                case 'u':
+                    playAudio(164.814);
+                    break;
+                case 'i':
+                    playAudio(174.614);
+                    break;
+                case '9':
+                    playAudio(184.997);
+                    break;
+                case 'o':
+                    playAudio(195.998);
+                    break;
+                case '0':
+                    playAudio(207.652);
+                    break;
+                case 'p':
+                    playAudio(220);
+                    break;
+                case '-':
+                    playAudio(233.082);
+                    break;
+                case '[':
+                    playAudio(246.942);
+                    break;
+
+                case 'z':
+                    playAudio(261.63);
+                    break;
+                case 'x':
+                    playAudio(293.665);
+                    break;
+                case 'c':
+                    playAudio(330);
+                    break;
+                case 'v':
+                    playAudio(349.228);
+                    break;
+                case 'b':
+                    playAudio(391.995);
+                    break;
+                case 'n':
+                    playAudio(440);
+                    break;
+                case 'm':
+                    playAudio(493.883);
+                    break;
+                case ',':
+                    playAudio(523.251);
+                    break;
+                case '.':
+                    playAudio(587.330);
+                    break;
+                case '/':
+                    playAudio(659.255);
+                    break;
+                case 's':
+                    playAudio(277.183);
+                    break;
+                case 'd':
+                    playAudio(311.127);
+                    break;
+                case 'g':
+                    playAudio(369.994);
+                    break;
+                case 'h':
+                    playAudio(415.305);
+                    break;
+                case 'j':
+                    playAudio(466.164);
+                    break;
+                case 'l':
+                    playAudio(554.365);
+                    break;
+                case ';':
+                    playAudio(622.254);
+                    break;
+            }output.textContent = `You pressed "${key}"`;
+            
+        });
+
+        document.addEventListener('keyup', (event) => {
+            stopAudio();
+        });
+
+        </script>
+
+        
+
+
+</body>
+
+
+</html>
