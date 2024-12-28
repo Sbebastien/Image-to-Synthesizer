@@ -144,8 +144,90 @@
             <p id="output">Press any key...</p>
             
         </div>
+
+
+        
+    <!-- keyboard -->
+     
     </div>
 
+    <style>
+        .piano {
+            display: flex;
+            position: relative;
+        }
+
+        .key {
+            width: 40px;
+            height: 200px;
+            border: 1px solid #000;
+            background-color: white;
+            position: relative;
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+            margin-right: -1px; /* Overlap keys slightly */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            font-size: 12px;
+        }
+
+        .key.black {
+            width: 30px;
+            height: 120px;
+            background-color: black;
+            color: white;
+            position: relative;
+        }
+        .key.active {
+            background-color: yellow;
+        }
+
+        .key.black.active {
+            background-color: blueviolet;
+        }
+    </style>
+
+    <div class="piano w-11/12 inline-flex m-20" id="piano">
+        <!-- White keys -->
+        <div class="key " data-key="q">q</div>
+        <div class="key black" data-key="2">2</div>
+        <div class="key" data-key="w">w</div>
+        <div class="key black" data-key="3">3</div>
+        <div class="key" data-key="e">e</div>
+        <div class="key black" data-key="4">4</div>
+        <div class="key" data-key="r">r</div>
+        <div class="key" data-key="t">t</div>
+        <div class="key black" data-key="6">6</div>
+        <div class="key" data-key="y">y</div>
+        <div class="key black" data-key="7">7</div>
+        <div class="key" data-key="u">u</div>
+
+        <div class="key" data-key="i">i</div>
+        <div class="key black" data-key="9">9</div>
+        <div class="key" data-key="o">o</div>
+        <div class="key black" data-key="0">0</div>
+        <div class="key" data-key="p">p</div>
+        <div class="key black" data-key="-">-</div>
+        <div class="key" data-key="[">[</div>
+        <div class="key" data-key="z">z</div>
+        <div class="key black" data-key="s">s</div>
+        <div class="key" data-key="x">x</div>
+        <div class="key black" data-key="d">d</div>
+        <div class="key" data-key="c">c</div>
+
+        <div class="key" data-key="v">v</div>
+        <div class="key black" data-key="g">g</div>
+        <div class="key" data-key="b">b</div>
+        <div class="key black" data-key="h">h</div>
+        <div class="key" data-key="n">n</div>
+        <div class="key black" data-key="j">j</div>
+        <div class="key" data-key="m">m</div>
+        <div class="key" data-key=",">,</div>
+        <div class="key black" data-key="l">l</div>
+        <div class="key" data-key=".">.</div>
+        <div class="key black" data-key=";">;</div>
+        <div class="key" data-key="/">/</div>
+      </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
@@ -239,17 +321,6 @@
 
 
 
-            //im thinking of somethinggggg like u separate the total values and sort them, so higher harmonics only happen when there are more colors (we knew this)
-            //but instead of the the partial being chosen based on how much area the color takes up, it can be chosen based on its value.
-            // the amount of area it takes up can be used to scale the individual rgb values to give us the actual amplitude if a frequency
-            //or amount can be asdr? because i cant really do anything with it rn
-
-            //alsooo once we get that the length of our dict (number of keys i.e. number of colors) is more than 36, we can start dividing it into
-            //36 parts, where some parts may have multiple keys, in which case in those parts with multiple keys,
-            //if sort by value then this is good, but otherwise just do the extra guys to asdr
-            //the key that has the most number of pixels is the main guy,
-            //the rest go to asdr? or soemthing else i suppose
-            //could have it become vibrato or summn
             function ImgtoSound(R, G, B, A){
                 var asdrlist = []
                 var volumes = [];
@@ -384,18 +455,7 @@
 
 
         
-            //lets start with: if there is one color- then it is only the first 3 oscillators
-            //if there is 2 colors- then its first 6
-            //or could have red be the higher partials idk what im doing
-            
-            //i think i want for when there is more detailed colors i.e. like a lot of details and different colors, thats when u get th higher frequencies
-
-            //what if i have another function, that just takes in a volume argument,,,
-            //and then inside it returns the vol[] list for the partials but skewed based on the volume argument
-            //and so the vol[] list is basically made once u process, but playing it is based on the function call
-            //so function should go pretty quickly
-            //no yes this function is only called when the volume changes, that way it doesnt have to calculate constantly, only once
-
+           
 
         });
         let audioCtx;
@@ -419,17 +479,6 @@
                 audioCtx.resume();
             }
 
-            //oooooh wait split into 36 sections... (36 * 3 = 108) + 1 = 109
-            //so then we have that red is 2 blue is 3 green is 4, red is 5 blue is 6...and so on
-            //hmmmmmmmm split image into 110 sections ? order by total value ?(R + G + B) first section has lowest value colors == first harmonic
-            //then if there are only say 16 colors on the image, then there will by default be only 16 harmonics (17-110 will have amplitude 0)
-            //and the size of the color will dictate how much amplitude goes to that harmonic? and what else... asdr is the shape of that color?
-            //so what if there are like 72 colors, so each 'section' has 2 colors in it. Then just have a more detailed asdr? i guess sooo
-            //what about the idea that the majority color dictates something. honestly no
-            //but now isnt it impossible to have like equal volume for a bunch of things?? no its not ! can have a less blue that is still only blue
-            //for now lets try to have the volume of fundamental just be 1 always... but im not sure if i want that forever
-            //maybe something else can change the volume of the fundamental hmmmmyessss
-            //and then something can add inharmonicity, and something can add vibrato hmmmm yessss
             const now = audioCtx.currentTime;
             const hm = document.getElementById('data');
             var volume = document.getElementById('vol').value;
@@ -634,12 +683,67 @@
             stopAudio();
         });
 
+        document.addEventListener('keydown', (event) => {
+            const key = event.key.toLowerCase();
+            const pianoKey = document.querySelector(`.key[data-key="${key}"]`);
+            if (pianoKey) {
+                pianoKey.classList.add('active');
+            }
+            });
+
+            document.addEventListener('keyup', (event) => {
+            const key = event.key.toLowerCase();
+            const pianoKey = document.querySelector(`.key[data-key="${key}"]`);
+            if (pianoKey) {
+                pianoKey.classList.remove('active');
+            }
+        });
+
+
+
+
+            //im thinking of somethinggggg like u separate the total values and sort them, so higher harmonics only happen when there are more colors (we knew this)
+            //but instead of the the partial being chosen based on how much area the color takes up, it can be chosen based on its value.
+            // the amount of area it takes up can be used to scale the individual rgb values to give us the actual amplitude if a frequency
+            //or amount can be asdr? because i cant really do anything with it rn
+
+            //alsooo once we get that the length of our dict (number of keys i.e. number of colors) is more than 36, we can start dividing it into
+            //36 parts, where some parts may have multiple keys, in which case in those parts with multiple keys,
+            //if sort by value then this is good, but otherwise just do the extra guys to asdr
+            //the key that has the most number of pixels is the main guy,
+            //the rest go to asdr? or soemthing else i suppose
+            //could have it become vibrato or summn
+
+
+ //lets start with: if there is one color- then it is only the first 3 oscillators
+            //if there is 2 colors- then its first 6
+            //or could have red be the higher partials idk what im doing
+            
+            //i think i want for when there is more detailed colors i.e. like a lot of details and different colors, thats when u get th higher frequencies
+
+            //what if i have another function, that just takes in a volume argument,,,
+            //and then inside it returns the vol[] list for the partials but skewed based on the volume argument
+            //and so the vol[] list is basically made once u process, but playing it is based on the function call
+            //so function should go pretty quickly
+            //no yes this function is only called when the volume changes, that way it doesnt have to calculate constantly, only once
+
+
+
+        //oooooh wait split into 36 sections... (36 * 3 = 108) + 1 = 109
+//so then we have that red is 2 blue is 3 green is 4, red is 5 blue is 6...and so on
+//hmmmmmmmm split image into 110 sections ? order by total value ?(R + G + B) first section has lowest value colors == first harmonic
+//then if there are only say 16 colors on the image, then there will by default be only 16 harmonics (17-110 will have amplitude 0)
+//and the size of the color will dictate how much amplitude goes to that harmonic? and what else... asdr is the shape of that color?
+//so what if there are like 72 colors, so each 'section' has 2 colors in it. Then just have a more detailed asdr? i guess sooo
+//what about the idea that the majority color dictates something. honestly no
+//but now isnt it impossible to have like equal volume for a bunch of things?? no its not ! can have a less blue that is still only blue
+//for now lets try to have the volume of fundamental just be 1 always... but im not sure if i want that forever
+//maybe something else can change the volume of the fundamental hmmmmyessss
+//and then something can add inharmonicity, and something can add vibrato hmmmm yessss
+
         </script>
 
-        
-
-
-</body>
-
-
 </html>
+
+
+
