@@ -20,7 +20,7 @@
                 Introduction
             </h7>
             <p>
-                What is Additive Synthesis:
+                What is Additive Synthesis?
                 Additive synthesis is a sound synthesis technique that creates timbre by adding sine waves.
                 This comes from the idea that any sound is just the sum of many sine waves.
                 I found this idea to be very interesting, and I wanted to use it in a way to create unique sounds and timbres.
@@ -51,35 +51,35 @@
                 I also tested the sound with different number of oscillators, and decided that going up to the 110th harmonic was plenty, as any harmonics after that
                 were hard to hear.  
                 <br>
-                Decided to have Red correspond to 2,5,7,9,11,14,17,20,23 harmonics,
-                Blue correspond to 3,6,9,12,15,18,21,24 harmonics
-                Green correspond to 4,7,10,13,16,19,22,25 harmonics
-
+                <br>
                 The algorithm I made that maps the image to the synthesizer works in several parts.
-                first it does this so that this and then this so that this
+                first it separates the image into the RGB data for each pixel. Then it sorts the colors of the image by 
+                how many pixels a certain color takes up. Then a list is created that consists of the RGB values of the colors from the most populated color
+                to the least populated color. This list is then mapped directly onto the partial harmonics, so that the first element in the list decides the amplitude
+                of the first harmonic and so on. I also did some tweaking with the amplitudes for all the harmonics so that the over all volume was not too loud.
 
+                Since each color has 3 attributes, R, G, and B, each color corresponds to 3 different harmonics. So after 36 colors, most of the harmonics are used up.
+                So if there are more than 36 colors, the extra colors get added to an asdr list, to control the asdr envelope for the harmonics.
 
-                also had to do like amplitude stuff so it sounds same volume always
-
-
-
-                The asdr,
-                so similar looking images could sound different in that they will have different attacks 
-
-                Then took idea of “bright” and “dark” to make low values correspond to low frequencies and high values to high frequencies nope!!!!!!!!
-                Separated the image by value, so more dark parts of image meant more lower frequencies like the 2nd, 3rd, and more light parts meant more higher frequencies, like 20th, 21st. Then the volume of a certain oscillator was proportional to how much blue or red or green it had, so if the brightest part of the image had lots of blue, then you would hear more of the 24th harmonic than the 23rd or 25th.
                 <br>
                 <br>
                 The user can create sounds in multiple ways:
                 they can upload an image from their computer, or 
                 they can draw on a canvas.
+                The volume can be controlled with the volume slider.
 
+                <!--
+                to add: 
+                other algorithms for mapping image to sound
+                polyphony
                 also thought about gifs and videos that update every 1/24th of a second or something
-
-                There is also a keyboard that pops up once you upload or finsih drawing a picture, that lets the user play with their newly synthesized sound
+                fix the sound disappearing issue
+                and then add the examples
+                -->
+                There is also a keyboard that pops up once you upload or finish drawing a picture, that lets the user play with their newly synthesized sound.
                 <br>
 
-                Here are some images:
+                <!--Here are some images:
                 these are all sine waves
 
                 This produces a square wave
@@ -88,7 +88,7 @@
 
                 this sounds kinda like a violin
 
-                this sounds kinda like a trumpet
+                this sounds kinda like a trumpet -->
 
             </p>
         </div>
@@ -129,11 +129,11 @@
             <hr>
 
             <div>
-                <h2>Result</h2>
+                <h2></h2>
                 <pre id="resultOutput"></pre>
             </div>
             <p id = "data" value="[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]"></p>
-
+            
 
 
             <h1>Additive Synth</h1>
@@ -141,7 +141,7 @@
             <label>Volume: <input type="range" id="vol" min = '0' max = '0.8' step = '0.01' value='0.8'></label>
 
             <h1>Press a Key to play music</h1>
-            <p id="output">Press any key...</p>
+            <p id="output">keyboard down there</p>
             
         </div>
 
@@ -318,14 +318,14 @@
         });
 
         const output = document.getElementById('data');
-
+        var asdrlist = [];
 
 
             function ImgtoSound(R, G, B, A){
-                var asdrlist = []
                 var volumes = [];
                 var value;
                 let dict = {};
+                let extradict = {};
                 let asdrdict = {};
                 //rounded rgb values
                 var Rr;
@@ -336,12 +336,10 @@
                     Gr = G[i] - (G[i] % 10);
                     Br = B[i] - (B[i] % 10);
                     value = [Rr,Gr,Br];
-                    if (A[i] = 1){
-                        if (value in dict){
-                            dict[value] += 1;
-                        } else {
-                            dict[value] = 1;
-                        }
+                    if (value in dict){
+                        dict[value] += 1;
+                    } else {
+                        dict[value] = 1;
                     }
                 }
                 for (let [color, amount] of Object.entries(dict)){
@@ -353,18 +351,21 @@
                     Object.entries(dict)
                     .sort(([, aValue], [, bValue]) => bValue - aValue)
                 );
-
-                if (Object.keys(sortedDict).length > 36){
-                    //amount of pixels will go to time? or to how much amplitude changes by?
-                }
-                output.textContent = Object.entries(sortedDict);
+                
                 var i = 0;
+                var j = 0;
                 for (let [color, amount] of Object.entries(sortedDict)){
                     colors = color.split(',');
                     volumes[(3 * i)] = colors[0];
                     volumes[(3 * i) + 1] = colors[1];
                     volumes[(3 * i) + 2] = colors[2];
                     i++;
+                    if (i > 36){
+                        asdrlist[(3 * j)] = colors[0];
+                        asdrlist[(3 * j) + 1] = colors[1];
+                        asdrlist[(3 * j) + 2] = colors[2];
+                        j++;
+                    }
                 }
                 
                 return volumes;
@@ -451,7 +452,7 @@
             }
             
             output.value = ImgtoSound(Rs, Gs, Bs, As);
-            output.textContent = ImgtoSound(Rs, Gs, Bs, As).value; 
+            //output.textContent = ImgtoSound(Rs, Gs, Bs, As).value; 
 
 
         
@@ -462,7 +463,7 @@
         let oscillators = [];
         let gains = [];
         var partialParams = [];
-        const attack = 0.1;
+        const attack = 0.05;
         const decay = 0.2;
         const sustain = 0.5;
         const release = 0.3;
@@ -484,7 +485,14 @@
             var volume = document.getElementById('vol').value;
             var vol = [];
             var partials = [];
-            for (let i = 1; i <= 110; i++){ 
+            var attacklist = [];
+            var decaylist = [];
+            var sustainlist = []
+            for (let i = 1; i <= 110; i++){
+                attacklist[i] = attack;
+                decaylist[i] = decay;
+                sustainlist[i] = sustain;
+
                 partials[i] = (i);
                 if (i == 1){
                     vol[i] = volume;
@@ -506,9 +514,34 @@
             }
             vol[1] = volume; 
 
+            if (asdrlist.length != 0){
+            }
+            var j = 0;
+            var k = 0;
+            var l = 0;
+            for (let i = 1; i < asdrlist.length; i++){
+                if (i % 3 == 1){
+                    attacklist[j] = asdrlist[i]/255;
+                    j++;
+                } if (i % 3 == 2){
+                    decaylist[k] = asdrlist[i]/255;
+                    k++;
+                } if (i % 3 == 0){
+                    sustainlist[l] = asdrlist[i]/255;
+                    l++
+                }
+
+            }
+
             // Define partials from the form inputs
             for (let i = 1; i<= 110; i++){ //seems like 110 partials is kinda the max we can hear
-                partialParams[i] = {freq: fundamental*partials[i], amp: vol[i]} //can have a param.attacklen param.decaylen, param.attackamp and stuff
+                partialParams[i] = {freq: fundamental*partials[i], 
+                    amp: vol[i], 
+                    att: attacklist[i], 
+                    dec: decaylist[i], 
+                    sus: sustainlist[i]}
+                //for now will only have decay, attack, and sustain
+                //can have a param.attacklen param.decaylen, param.attackamp and stuff
                 //and can also have values for the amplitude before the sustain and stuff that we can add on
             }
 
@@ -523,8 +556,8 @@
                 osc.connect(gainNode).connect(audioCtx.destination);
                 gainNode.gain.cancelScheduledValues(now); // Clear any previous schedules
                 gainNode.gain.setValueAtTime(0, now); // Start at 0 gain
-                gainNode.gain.linearRampToValueAtTime(param.amp, now + 0.01); // Attack phase
-                gainNode.gain.linearRampToValueAtTime(param.amp*1/2, now + attack + decay); // Decay to sustain
+                gainNode.gain.linearRampToValueAtTime(param.amp, now + param.att); // Attack phase
+                gainNode.gain.linearRampToValueAtTime(param.amp*param.sus, now + param.att + param.dec); // Decay to sustain
                 
 
                 oscillators.push(osc);
